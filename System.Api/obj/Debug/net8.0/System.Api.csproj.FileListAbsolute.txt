@@ -262,3 +262,4 @@ E:\Windows\Underway\Project\System\System.Api\obj\Debug\net8.0\refint\System.Api
 E:\Windows\Underway\Project\System\System.Api\obj\Debug\net8.0\System.Api.pdb
 E:\Windows\Underway\Project\System\System.Api\obj\Debug\net8.0\System.Api.genruntimeconfig.cache
 E:\Windows\Underway\Project\System\System.Api\obj\Debug\net8.0\ref\System.Api.dll
+E:\Windows\Underway\Project\System\System.Api\obj\Debug\net8.0\System.Api.sourcelink.json
