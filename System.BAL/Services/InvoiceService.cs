@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System.DAL.Data;
+using System.DAL.DTOs;
 using System.DAL.Models;
 
 namespace System.BAL.Services
@@ -7,36 +9,43 @@ namespace System.BAL.Services
     public class InvoiceService
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public InvoiceService(AppDbContext context)
+        public InvoiceService(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Invoice>> GetAllInvoicesAsync()
+        public async Task<IEnumerable<InvoiceDTO>> GetAllInvoicesAsync()
         {
-            return await _context.Invoices.Include(i => i.Order).ThenInclude(o => o.OrderItems).ToListAsync();
+            var invoices = await _context.Invoices
+                .Include(i => i.Products)
+                .ToListAsync();
+            return _mapper.Map<IEnumerable<InvoiceDTO>>(invoices);
         }
 
-        public async Task<Invoice> GetInvoiceByIdAsync(int id)
+        public async Task<InvoiceDTO> GetInvoiceByIdAsync(int id)
         {
-            return await _context.Invoices.Include(i => i.Order)
-                                          .ThenInclude(o => o.OrderItems)
-                                          .FirstOrDefaultAsync(i => i.InvoiceId == id);
+            var invoice = await _context.Invoices
+                .Include(i => i.Products)
+                .FirstOrDefaultAsync(i => i.InvoiceId == id);
+            return _mapper.Map<InvoiceDTO>(invoice);
         }
 
-        public async Task<Invoice> AddInvoiceAsync(Invoice invoice)
+        public async Task<InvoiceDTO> AddInvoiceAsync(InvoiceDTO invoiceDTO)
         {
+            var invoice = _mapper.Map<Invoice>(invoiceDTO);
             _context.Invoices.Add(invoice);
             await _context.SaveChangesAsync();
-            return invoice;
+            return _mapper.Map<InvoiceDTO>(invoice);
         }
 
-        public async Task<Invoice> UpdateInvoiceAsync(Invoice invoice)
+        public async Task UpdateInvoiceAsync(InvoiceDTO invoiceDTO)
         {
-            _context.Invoices.Update(invoice);
+            var invoice = _mapper.Map<Invoice>(invoiceDTO);
+            _context.Entry(invoice).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return invoice;
         }
 
         public async Task DeleteInvoiceAsync(int id)

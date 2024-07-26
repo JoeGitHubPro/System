@@ -1,42 +1,48 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System.DAL.Data;
+using System.DAL.DTOs;
 using System.DAL.Models;
 
 namespace System.BAL.Services
 {
+
     public class ProductService
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ProductService(AppDbContext context)
+        public ProductService(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Product>> GetAllProductsAsync()
+        public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync()
         {
-            return await _context.Products.Include(p => p.Category).Include(p => p.Additions).ToListAsync();
+            var products = await _context.Products.ToListAsync();
+            return _mapper.Map<IEnumerable<ProductDTO>>(products);
         }
 
-        public async Task<Product> GetProductByIdAsync(int id)
+        public async Task<ProductDTO> GetProductByIdAsync(int id)
         {
-            return await _context.Products.Include(p => p.Category)
-                                           .Include(p => p.Additions)
-                                           .FirstOrDefaultAsync(p => p.ProductId == id);
+            var product = await _context.Products.FindAsync(id);
+            return _mapper.Map<ProductDTO>(product);
         }
 
-        public async Task<Product> AddProductAsync(Product product)
+        public async Task<ProductDTO> AddProductAsync(ProductDTO productDTO)
         {
+            var product = _mapper.Map<Product>(productDTO);
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
-            return product;
+            return _mapper.Map<ProductDTO>(product);
         }
 
-        public async Task<Product> UpdateProductAsync(Product product)
+        public async Task UpdateProductAsync(ProductDTO productDTO)
         {
-            _context.Products.Update(product);
+            var product = _mapper.Map<Product>(productDTO);
+            _context.Entry(product).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return product;
         }
 
         public async Task DeleteProductAsync(int id)
@@ -48,8 +54,6 @@ namespace System.BAL.Services
                 await _context.SaveChangesAsync();
             }
         }
-
-
     }
 }
 

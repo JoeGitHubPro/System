@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System.DAL.Data;
+using System.DAL.DTOs;
 using System.DAL.Models;
 
 namespace System.BAL.Services
@@ -7,34 +9,39 @@ namespace System.BAL.Services
     public class AdditionService
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public AdditionService(AppDbContext context)
+        public AdditionService(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Addition>> GetAllAdditionsAsync()
+        public async Task<IEnumerable<AdditionDTO>> GetAllAdditionsAsync()
         {
-            return await _context.Additions.ToListAsync();
+            var additions = await _context.Additions.ToListAsync();
+            return _mapper.Map<IEnumerable<AdditionDTO>>(additions);
         }
 
-        public async Task<Addition> GetAdditionByIdAsync(int id)
+        public async Task<AdditionDTO> GetAdditionByIdAsync(int id)
         {
-            return await _context.Additions.FirstOrDefaultAsync(a => a.AdditionId == id);
+            var addition = await _context.Additions.FindAsync(id);
+            return _mapper.Map<AdditionDTO>(addition);
         }
 
-        public async Task<Addition> AddAdditionAsync(Addition addition)
+        public async Task<AdditionDTO> AddAdditionAsync(AdditionDTO additionDTO)
         {
+            var addition = _mapper.Map<Addition>(additionDTO);
             _context.Additions.Add(addition);
             await _context.SaveChangesAsync();
-            return addition;
+            return _mapper.Map<AdditionDTO>(addition);
         }
 
-        public async Task<Addition> UpdateAdditionAsync(Addition addition)
+        public async Task UpdateAdditionAsync(AdditionDTO additionDTO)
         {
-            _context.Additions.Update(addition);
+            var addition = _mapper.Map<Addition>(additionDTO);
+            _context.Entry(addition).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return addition;
         }
 
         public async Task DeleteAdditionAsync(int id)

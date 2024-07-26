@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System.DAL.Data;
+using System.DAL.DTOs;
 using System.DAL.Models;
 
 namespace System.BAL.Services
@@ -7,36 +9,43 @@ namespace System.BAL.Services
     public class OrderService
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public OrderService(AppDbContext context)
+        public OrderService(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
+        public async Task<IEnumerable<OrderDTO>> GetAllOrdersAsync()
         {
-            return await _context.Orders.Include(o => o.OrderItems).ThenInclude(oi => oi.Product).ToListAsync();
+            var orders = await _context.Orders
+                .Include(o => o.Products)
+                .ToListAsync();
+            return _mapper.Map<IEnumerable<OrderDTO>>(orders);
         }
 
-        public async Task<Order> GetOrderByIdAsync(int id)
+        public async Task<OrderDTO> GetOrderByIdAsync(int id)
         {
-            return await _context.Orders.Include(o => o.OrderItems)
-                                        .ThenInclude(oi => oi.Product)
-                                        .FirstOrDefaultAsync(o => o.OrderId == id);
+            var order = await _context.Orders
+                .Include(o => o.Products)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
+            return _mapper.Map<OrderDTO>(order);
         }
 
-        public async Task<Order> AddOrderAsync(Order order)
+        public async Task<OrderDTO> AddOrderAsync(OrderDTO orderDTO)
         {
+            var order = _mapper.Map<Order>(orderDTO);
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
-            return order;
+            return _mapper.Map<OrderDTO>(order);
         }
 
-        public async Task<Order> UpdateOrderAsync(Order order)
+        public async Task UpdateOrderAsync(OrderDTO orderDTO)
         {
-            _context.Orders.Update(order);
+            var order = _mapper.Map<Order>(orderDTO);
+            _context.Entry(order).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return order;
         }
 
         public async Task DeleteOrderAsync(int id)
