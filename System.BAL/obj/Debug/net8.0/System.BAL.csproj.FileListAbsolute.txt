@@ -13,3 +13,4 @@ E:\Windows\Underway\Project\System\System.BAL\obj\Debug\net8.0\System.BAL.dll
 E:\Windows\Underway\Project\System\System.BAL\obj\Debug\net8.0\refint\System.BAL.dll
 E:\Windows\Underway\Project\System\System.BAL\obj\Debug\net8.0\System.BAL.pdb
 E:\Windows\Underway\Project\System\System.BAL\obj\Debug\net8.0\ref\System.BAL.dll
+E:\Windows\Underway\Project\System\System.BAL\obj\Debug\net8.0\System.BAL.sourcelink.json

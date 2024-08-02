@@ -300,3 +300,4 @@ E:\Windows\Underway\Project\System\System.MVC\obj\Debug\net8.0\refint\System.MVC
 E:\Windows\Underway\Project\System\System.MVC\obj\Debug\net8.0\System.MVC.pdb
 E:\Windows\Underway\Project\System\System.MVC\obj\Debug\net8.0\System.MVC.genruntimeconfig.cache
 E:\Windows\Underway\Project\System\System.MVC\obj\Debug\net8.0\ref\System.MVC.dll
+E:\Windows\Underway\Project\System\System.MVC\obj\Debug\net8.0\System.MVC.sourcelink.json
